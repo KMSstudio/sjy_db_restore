@@ -1,6 +1,7 @@
 import os
 import shutil
 import pandas as pd
+import sjy
 
 src_folder = 'data/album/images'
 des_folder = 'data/refine/image'
@@ -17,23 +18,12 @@ def copy_all_files(src, dest):
 # Copy images to data/refine/image
 copy_all_files(src_folder, des_folder)
 
-# Refine string
-refine_dict = { '&nbsp;': ' ', 
-    '\\\'': '\'', '\\\"': '\"',
-    '&gt;': ' ', '&it;': ' ', '&amp': ' ', '&lt;': '',
-    '병신': '##', '존나': '##', '지랄': '##', '좆': '#', '좇': '#', '씹': '#',
-}
-def refine_string(string):
-    for key, value in refine_dict.items():
-        string = string.replace(key, f";{value}")
-    return string
-
 member = pd.read_csv('data/member/member_table.csv')
 album = pd.read_csv('data/album/album.csv')
 
 album['id'] = album['name'].apply(lambda name: member[member['name'] == name].iloc[0]['user_id'])
-album['memo'] = album['memo'].apply(refine_string)
-album['subject'] = album['subject'].apply(refine_string)
+album['memo'] = album['memo'].apply(sjy.refine_string)
+album['subject'] = album['subject'].apply(sjy.refine_string)
 
 album = album.drop(columns='file_name1')
 album = album.rename(columns={'s_file_name1': 'file'})

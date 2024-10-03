@@ -9,6 +9,17 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 import time
 
+# Refine string
+refine_dict = { '&nbsp;': ' ', 
+    '\\\'': '\'', '\\\"': '\"',
+    '&gt;': ' ', '&it;': ' ', '&amp': ' ', '&lt;': '',
+    '병신': '##', '존나': '##', '지랄': '##', '좆': '#', '좇': '#', '씹': '#',
+}
+def refine_string(string):
+    for key, value in refine_dict.items():
+        string = string.replace(key, f";{value}")
+    return string
+
 def login(driver, id='hckim', pw='hckim'):
     # Open chrome driver
     driver.get('http://jaeyongsong.com/bsr/login.php')
@@ -168,11 +179,85 @@ def album_write(driver, title="This is album title", image_lst = ['002.jpg', '00
     WebDriverWait(driver, 20).until(
         EC.presence_of_element_located((By.XPATH, '//*[@id="visual"]')) )
     
+# Column write
+# Write column
+def column_write(driver, title="This is title", content="This is content", url="www.naver.com", date="2005-10-13"):
+    # Open chrome driver
+    driver.get('http://jaeyongsong.com/bsr/board.php?bo_table=column')
+
+    # Press write button
+    write_btn = WebDriverWait(driver, 20).until(
+        EC.presence_of_element_located((By.XPATH, '//*[@id="fboardlist"]/div[3]/div/ul/li/a')) )
+    write_btn.click()
+    
+    # Title
+    title_inp = WebDriverWait(driver, 20).until(
+        EC.presence_of_element_located((By.XPATH, '//*[@id="wr_subject"]')) )
+    title_inp.send_keys(title)
+
+    # Image
+    def put_url(url):
+        # Select iframe
+        up_iframe = WebDriverWait(driver, 20).until(
+            EC.presence_of_element_located((By.XPATH, '//*[@id="fwrite"]/div[3]/div/iframe')) )
+        driver.switch_to.frame(up_iframe)
+
+        # Open popup window
+        url_btn = driver.find_element(By.XPATH, '//*[@id="se2_tool"]/div/ul[6]/li[1]/button')
+        url_btn.click()
+
+        # Upload file
+        url_inp = WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.XPATH, '//*[@id="se2_tool"]/div/ul[6]/li[1]/div/div/div/input')))
+        url_inp.send_keys(url)
+
+        # Submit
+        submit_btn = WebDriverWait(driver, 20).until(
+            EC.presence_of_element_located((By.XPATH, '//*[@id="se2_tool"]/div/ul[6]/li[1]/div/div/div/button[1]')))
+        submit_btn.click()
+
+        # Return to default content
+        driver.switch_to.default_content()
+
+    # Content
+    def put_content(content):
+        # Switch to iframe
+        up_iframe = WebDriverWait(driver, 20).until(
+            EC.presence_of_element_located((By.XPATH, '//*[@id="fwrite"]/div[3]/div/iframe')) )
+        driver.switch_to.frame(up_iframe)
+        iframe = WebDriverWait(driver, 20).until(
+            EC.presence_of_element_located((By.XPATH, '//*[@id="se2_iframe"]')) ) 
+        driver.switch_to.frame(iframe)
+
+        # Content
+        content_area = driver.find_element(By.CSS_SELECTOR, "body > p")
+        content_area.send_keys(content)
+
+        # Return to default content
+        driver.switch_to.default_content()
+
+    put_content(f'{content}\n')
+    if len(str(url)) > 3: put_url(url)
+    put_content(f'\n\n작성일: {date}')
+    
+    # Submit
+    submit_btn = WebDriverWait(driver, 20).until(
+        EC.presence_of_element_located((By.XPATH, '//*[@id="btn_submit"]')) )
+    submit_btn.click()
+
+    # Wait until main page loaded
+    WebDriverWait(driver, 20).until(
+        EC.presence_of_element_located((By.XPATH, '//*[@id="sub_div"]/div')))
+    
+    # Go to main page
+    driver.get('http://jaeyongsong.com')
+    WebDriverWait(driver, 20).until(
+        EC.presence_of_element_located((By.XPATH, '//*[@id="visual"]')) )
+    
 if __name__ == '__main__':
     driver = webdriver.Chrome()
-    login(driver)
+    login(driver, id='jsong', pw='jsong')
     time.sleep(3)
-    album_write(driver)
+    column_write(driver)
     time.sleep(3)
     logout(driver)
     time.sleep(3)
