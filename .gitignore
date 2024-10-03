@@ -1,0 +1,7 @@
+# member data
+data/member/member_regist.xlsx
+data/member/*.*
+
+# image files
+data/album/images/*.*
+data/refine/image/*.*
