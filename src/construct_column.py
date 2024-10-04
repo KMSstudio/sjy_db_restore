@@ -11,7 +11,7 @@ driver = webdriver.Chrome()
 idx_src = 124
 idx_cur = idx_src
 for idx, row in column.iloc[idx_src:].iterrows():
-    sjy.login(driver, 'jsong', 'jsong')
+    sjy.login(driver, '#####', '#####')
     sjy.column_write(driver, title=row['subject'], content=row['memo'], url=row['sitelink1'], date=row['date'])
     sjy.logout(driver)
     time.sleep(5)
