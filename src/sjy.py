@@ -13,11 +13,11 @@ import time
 refine_dict = { '&nbsp;': ' ', 
     '\\\'': '\'', '\\\"': '\"',
     '&gt;': ' ', '&it;': ' ', '&amp': ' ', '&lt;': '',
-    '병신': '##', '존나': '##', '지랄': '##', '좆': '#', '좇': '#', '씹': '#',
+    '병신': '##', '존나': '##', '지랄': '##', '좆': '#', '좇': '#', '씹': '#'
 }
 def refine_string(string):
     for key, value in refine_dict.items():
-        string = string.replace(key, f";{value}")
+        string = string.replace(key, f"{value}")
     return string
 
 def login(driver, id='hckim', pw='hckim'):
